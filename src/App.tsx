@@ -2,15 +2,17 @@ import "aframe"
 import AFRAME from "aframe"
 import {
   Scene,
-  Box,
   Camera,
   Entity,
   Assets,
-  VideoSphere
+  VideoSphere,
+  Sphere,
+  Cylinder
 } from '@belivvr/aframe-react'
 import pano from "./assets/pano.mp4"
 import play from "./assets/play.png"
 import pause from "./assets/pause.png"
+import arrow from "./assets/arrow.png"
 import { useState } from "react"
 
 AFRAME.registerComponent("click", {
@@ -27,7 +29,7 @@ AFRAME.registerComponent("click", {
         video.play()
       }
 
-      if (cmd === "stop") {
+      if (cmd === "pause") {
         video.pause()
       }
     })
@@ -45,47 +47,61 @@ function App() {
           <img id="cubes" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-cubes.jpg" />
           <img id="play" src={play} />
           <img id="pause" src={pause} />
+          <img id="arrow" src={arrow} />
           <video id="pano" src={url} loop />
         </Assets>
 
         <Entity
-          geometry={{ primitive: "plane", height: 1, width: 1 }}
-          material={{ shader: "flat", src: "#pause", transparent: true }}
-          position={{ x: 0.75, y: 0, z: -3 }}
+          geometry={{ primitive: "plane", height: 0.5, width: 0.5 }}
+          material={{ shader: "flat", src: "#arrow", transparent: true }}
+          position={{ x: 1, y: 0, z: -3 }}
           rotation={{ x: -30, y: 0, z: 0 }}
-          click={{ cmd: "stop" }}
+          click={{ cmd: "prev" }}
           data-clickable
         />
 
-
         <Entity
-          geometry={{ primitive: "plane", height: 1, width: 1 }}
+          geometry={{ primitive: "plane", height: 0.5, width: 0.5 }}
           material={{ shader: "flat", src: "#play", transparent: true }}
-          position={{ x: -0.75, y: 0, z: -3 }}
+          position={{ x: 0.35, y: 0, z: -3 }}
           rotation={{ x: -30, y: 0, z: 0 }}
           click={{ cmd: "play" }}
           data-clickable
         />
 
-        <Box
-          position={{ x: 0, y: -0.3, z: -3.5 }}
+        <Entity
+          geometry={{ primitive: "plane", height: 0.5, width: 0.5 }}
+          material={{ shader: "flat", src: "#pause", transparent: true }}
+          position={{ x: -0.35, y: 0, z: -3 }}
           rotation={{ x: -30, y: 0, z: 0 }}
-          geometry={{ width: 3, height: 1 }}
-          color="#4CC3D9"
+          click={{ cmd: "pause" }}
+          data-clickable
         />
 
-        <Box
-          position={{ x: -1.7, y: -0.95, z: -3.5 }}
-          rotation={{ x: -30, y: 0, z: 60 }}
-          geometry={{ width: 2, height: 1 }}
-          color="#4CC3D9"
+        <Entity
+          geometry={{ primitive: "plane", height: 0.5, width: 0.5 }}
+          material={{ shader: "flat", src: "#arrow", transparent: true }}
+          position={{ x: -1, y: 0, z: -3 }}
+          rotation={{ x: -30, y: 0, z: 180 }}
+          click={{ cmd: "next" }}
+          data-clickable
         />
 
-        <Box
-          position={{ x: 1.7, y: -0.95, z: -3.5 }}
-          rotation={{ x: -30, y: 0, z: -60 }}
-          geometry={{ width: 2, height: 1 }}
-          color="#4CC3D9"
+        <Cylinder
+          position={{ x: 0, y: -0.3, z: -3.5 }}
+          rotation={{ x: 0, y: 0, z: 90 }}
+          height={3}
+          radius={0.5}
+        />
+
+        <Sphere
+          radius={0.5}
+          position={{ x: 1.5, y: -0.3, z: -3.5 }}
+        />
+
+        <Sphere
+          radius={0.5}
+          position={{ x: -1.5, y: -0.3, z: -3.5 }}
         />
 
         <Camera>
