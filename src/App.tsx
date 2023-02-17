@@ -9,38 +9,34 @@ import {
   VideoSphere
 } from '@belivvr/aframe-react'
 import pano from "./assets/pano.mp4"
-import { useEffect, useRef } from "react"
 
-function App() {
-  const ref = useRef<HTMLVideoElement | null>(null)
+AFRAME.registerComponent("click", {
+  schema: {
+    cmd: { default: "default" }
+  },
+  init() {
+    const { cmd } = this.data
 
-  useEffect(() => {
-    AFRAME.registerComponent("click", {
-      schema: {
-        cmd: { default: "default" }
-      },
-      init() {
-        const { cmd } = this.data
+    this.el.addEventListener("click", () => {
+      if (cmd === "play") {
+        document.getElementById("pano").play()
+      }
 
-        this.el.addEventListener("click", () => {
-          if (cmd === "play") {
-            ref.current?.play()
-          }
-
-          if (cmd === "stop") {
-            ref.current?.pause()
-          }
-        })
+      if (cmd === "stop") {
+        document.getElementById("pano").pause()
       }
     })
-  }, [ref])
+  }
+})
 
+
+function App() {
   return (
     <div>
       <Scene>
         <Assets>
           <img id="cubes" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-cubes.jpg" />
-          <video id="pano" src={`${pano}#t=0.1`} ref={ref} loop />
+          <video id="pano" src={`${pano}#t=0.1`} loop />
         </Assets>
 
         <Box
