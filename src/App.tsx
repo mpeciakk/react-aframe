@@ -13,32 +13,34 @@ import pano from "./assets/pano.mp4"
 import play from "./assets/play.png"
 import pause from "./assets/pause.png"
 import arrow from "./assets/arrow.png"
-import { useState } from "react"
-
-AFRAME.registerComponent("click", {
-  schema: {
-    cmd: { default: "default" }
-  },
-  init() {
-    const { cmd } = this.data
-
-    this.el.addEventListener("click", () => {
-      const video = document.getElementById("pano") as HTMLVideoElement
-
-      if (cmd === "play") {
-        video.play()
-      }
-
-      if (cmd === "pause") {
-        video.pause()
-      }
-    })
-  }
-})
-
+import { useEffect, useState, useRef } from "react"
 
 function App() {
+  const ref = useRef<HTMLVideoElement | null>(null)
   const [url, setUrl] = useState<string>(`${pano}#t=0.1`)
+
+  useEffect(() => {
+    if (AFRAME.components["click"] != null) return
+
+    AFRAME.registerComponent("click", {
+      schema: {
+        cmd: { default: "default" }
+      },
+      init() {
+        const { cmd } = this.data
+
+        this.el.addEventListener("click", () => {
+          if (cmd === "play") {
+            ref.current!.play()
+          }
+
+          if (cmd === "pause") {
+            ref.current!.pause()
+          }
+        })
+      }
+    })
+  })
 
   return (
     <div>
@@ -48,7 +50,7 @@ function App() {
           <img id="play" src={play} />
           <img id="pause" src={pause} />
           <img id="arrow" src={arrow} />
-          <video id="pano" src={url} loop />
+          <video id="pano" src={url} ref={ref} loop />
         </Assets>
 
         <Entity
