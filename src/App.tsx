@@ -7,20 +7,57 @@ import {
   Assets,
   VideoSphere,
   Sphere,
-  Cylinder
+  Cylinder,
 } from '@belivvr/aframe-react'
-import pano from "./assets/pano.mp4"
 import play from "./assets/play.png"
 import pause from "./assets/pause.png"
 import arrow from "./assets/arrow.png"
-import { useEffect, useState, useRef } from "react"
+import { useLayoutEffect } from "react"
+
+let i = 0
+const videos = [{id: "vr2", url: "https://fs.peciak.xyz/vr2.mp4"}, { id: "vr1", url: "https://fs.peciak.xyz/vr1.mp4"}, {id: "pano", url: "https://fs.peciak.xyz/pano.mp4"}]
+let currentVideo = videos[i]
+
+const pauseAllVideosExceptCurrent = () => {
+  for (const video of videos) {
+    if (video !== currentVideo) {
+      const videoElement = document.getElementById(video.id) as HTMLVideoElement
+      videoElement.pause()
+    }
+  }
+}
+
+const updateVideo = () => {
+  currentVideo = videos[i]
+
+  document.getElementById("videosphere")?.setAttribute("src", `#${currentVideo.id}`)
+}
+
+const nextVideo = () => {
+  i++
+
+  if (i == videos.length) {
+    i = 0
+  }
+
+  updateVideo()
+  pauseAllVideosExceptCurrent()
+}
+
+const prevVideo = () => {
+  i--
+
+  if (i === -1) {
+    i = videos.length - 1
+  }
+
+  updateVideo()
+  pauseAllVideosExceptCurrent()
+}
 
 function App() {
-  const ref = useRef<HTMLVideoElement | null>(null)
-  const [url, setUrl] = useState<string>(`${pano}#t=0.1`)
-
-  useEffect(() => {
-    if (AFRAME.components["click"] != null) return
+  const mountComponents = () => {
+    if (AFRAME.components["click"]) delete AFRAME.components.click
 
     AFRAME.registerComponent("click", {
       schema: {
@@ -31,29 +68,47 @@ function App() {
 
         this.el.addEventListener("click", () => {
           if (cmd === "play") {
-            ref.current!.play()
+            const videoElement = document.getElementById(currentVideo.id) as HTMLVideoElement
+            videoElement.play()
           }
 
           if (cmd === "pause") {
-            ref.current!.pause()
+            const videoElement = document.getElementById(currentVideo.id) as HTMLVideoElement
+            videoElement.pause()
+          }
+
+          if (cmd === "next") {
+            nextVideo()
+          }
+
+          if (cmd === "prev") {
+            prevVideo()
           }
         })
       }
     })
+  }
+
+  useLayoutEffect(() => {
+    mountComponents()
   })
 
   return (
     <div>
       <Scene>
         <Assets>
-          <img id="cubes" src="https://cdn.aframe.io/360-image-gallery-boilerplate/img/thumb-cubes.jpg" />
           <img id="play" src={play} />
           <img id="pause" src={pause} />
           <img id="arrow" src={arrow} />
-          <video id="pano" src={url} ref={ref} loop />
+          {
+            videos.map((v, i) => {
+              return <video key={i} id={v.id} src={v.url} loop />
+            })
+          }
         </Assets>
 
         <Entity
+          primitive
           geometry={{ primitive: "plane", height: 0.5, width: 0.5 }}
           material={{ shader: "flat", src: "#arrow", transparent: true }}
           position={{ x: 1, y: 0, z: -3 }}
@@ -119,7 +174,7 @@ function App() {
           />
         </Camera>
 
-        <VideoSphere src="#pano" />
+        <VideoSphere id="videosphere" src={`#${currentVideo.id}`} />
       </Scene>
     </div>
   )
